@@ -1,0 +1,147 @@
+import { useState } from "react";
+import { MoreVertical, FolderOpen, Copy, Download, Trash2, Calendar, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+interface ProjectCardProps {
+  id: string;
+  title: string;
+  description?: string;
+  status: "draft" | "in-progress" | "completed" | "exported";
+  lastUpdated: string;
+  tags?: string[];
+  thumbnail?: string;
+  onClick?: () => void;
+  style?: React.CSSProperties;
+}
+
+const statusConfig = {
+  draft: { label: "Draft", className: "bg-muted text-muted-foreground" },
+  "in-progress": { label: "In Progress", className: "bg-warning/10 text-warning border-warning/20" },
+  completed: { label: "Completed", className: "bg-success/10 text-success border-success/20" },
+  exported: { label: "Exported", className: "bg-primary/10 text-primary border-primary/20" },
+};
+
+export function ProjectCard({ 
+  title, 
+  description, 
+  status, 
+  lastUpdated, 
+  tags = [], 
+  thumbnail, 
+  onClick,
+  style 
+}: ProjectCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const statusInfo = statusConfig[status];
+
+  return (
+    <div 
+      className={cn(
+        "group relative bg-card border border-border rounded-2xl p-6 cursor-pointer transition-all duration-200",
+        "hover:shadow-medium hover:border-primary/20 hover:-translate-y-1",
+        isHovered && "shadow-medium border-primary/20 -translate-y-1"
+      )}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={style}
+    >
+      {/* Thumbnail */}
+      <div className="w-full h-32 bg-gradient-subtle rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+        {thumbnail ? (
+          <img src={thumbnail} alt={title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-gradient-brand/10">
+            <FolderOpen className="w-8 h-8 text-primary" />
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="space-y-3">
+        {/* Title & Actions */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-heading-3 text-card-foreground font-semibold line-clamp-2 flex-1">
+            {title}
+          </h3>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <FolderOpen className="mr-2 h-4 w-4" />
+                Open
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Description */}
+        {description && (
+          <p className="text-body-small text-text-secondary line-clamp-2">
+            {description}
+          </p>
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
+                <Tag className="w-3 h-3 mr-1" />
+                {tag}
+              </Badge>
+            ))}
+            {tags.length > 3 && (
+              <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                +{tags.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <Badge className={statusInfo.className}>
+            {statusInfo.label}
+          </Badge>
+          <div className="flex items-center gap-1 text-xs text-text-muted">
+            <Calendar className="w-3 h-3" />
+            {lastUpdated}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

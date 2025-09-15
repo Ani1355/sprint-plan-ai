@@ -1,11 +1,161 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Clock, FolderOpen, Sparkles, Filter } from "lucide-react";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { KPICard } from "@/components/dashboard/KPICard";
+import { ProjectCard } from "@/components/dashboard/ProjectCard";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Mock data
+const kpiData = [
+  {
+    title: "Avg Time to PRD",
+    value: "2.4 hrs",
+    change: { value: "32% faster", trend: "up" as const },
+    icon: Clock,
+  },
+  {
+    title: "Projects Created",
+    value: "24",
+    change: { value: "8 this month", trend: "up" as const },
+    icon: FolderOpen,
+  },
+  {
+    title: "AI Suggestions Used",
+    value: "156",
+    change: { value: "12% more", trend: "up" as const },
+    icon: Sparkles,
+  },
+];
+
+const mockProjects = [
+  {
+    id: "1",
+    title: "Mobile Banking App Redesign",
+    description: "Complete overhaul of the mobile banking experience with focus on accessibility and user engagement.",
+    status: "in-progress" as const,
+    lastUpdated: "2 hours ago",
+    tags: ["Fintech", "Mobile", "UX"],
+  },
+  {
+    id: "2", 
+    title: "AI-Powered Customer Support",
+    description: "Implementation of chatbot and automated support workflows to reduce response times.",
+    status: "draft" as const,
+    lastUpdated: "1 day ago",
+    tags: ["AI", "Support", "Automation"],
+  },
+  {
+    id: "3",
+    title: "E-commerce Analytics Dashboard",
+    description: "Real-time analytics platform for tracking sales, user behavior, and inventory management.",
+    status: "completed" as const,
+    lastUpdated: "3 days ago",
+    tags: ["Analytics", "Dashboard", "E-commerce"],
+  },
+  {
+    id: "4",
+    title: "Social Media Integration",
+    description: "Cross-platform social media management tools with scheduling and analytics.",
+    status: "exported" as const,
+    lastUpdated: "1 week ago",
+    tags: ["Social", "Integration", "Marketing"],
+  },
+];
 
 const Index = () => {
+  const [filter, setFilter] = useState("all");
+  const [projects] = useState(mockProjects);
+
+  // Show empty state if no projects
+  const showEmptyState = projects.length === 0;
+
+  const filteredProjects = projects.filter(project => {
+    if (filter === "all") return true;
+    return project.status === filter;
+  });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="flex min-h-screen w-full bg-background">
+      <Sidebar />
+      
+      <div className="flex-1 flex flex-col">
+        <Header />
+        
+        <main className="flex-1 p-6 space-y-8">
+          {/* Welcome Section */}
+          <div className="space-y-2">
+            <h1 className="text-display text-foreground">
+              Welcome back, Alex 👋
+            </h1>
+            <p className="text-body text-text-secondary">
+              Here's what's happening with your projects today.
+            </p>
+          </div>
+
+          {showEmptyState ? (
+            <EmptyState />
+          ) : (
+            <>
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {kpiData.map((kpi, index) => (
+                  <KPICard 
+                    key={kpi.title}
+                    {...kpi}
+                    className={`animate-fade-in`}
+                    style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
+                  />
+                ))}
+              </div>
+
+              {/* Projects Section */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-heading-1 text-foreground">Recent Projects</h2>
+                  <div className="flex items-center gap-3">
+                    <Select value={filter} onValueChange={setFilter}>
+                      <SelectTrigger className="w-40">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue placeholder="Filter projects" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Projects</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="exported">Exported</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="outline" className="button-secondary">
+                      View All
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Projects Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredProjects.map((project, index) => (
+                    <ProjectCard
+                      key={project.id}
+                      {...project}
+                      onClick={() => console.log(`Opening project ${project.id}`)}
+                      style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </main>
       </div>
     </div>
   );
