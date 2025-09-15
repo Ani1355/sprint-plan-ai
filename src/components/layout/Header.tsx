@@ -1,6 +1,7 @@
 import { Search, Bell, Plus, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Header() {
+  const navigate = useNavigate();
   return (
     <header className="flex items-center justify-between h-16 px-6 bg-card border-b border-border">
       {/* Search */}
@@ -27,7 +29,10 @@ export function Header() {
       {/* Right Actions */}
       <div className="flex items-center gap-3">
         {/* Quick Create */}
-        <Button className="button-primary flex items-center gap-2">
+        <Button 
+          onClick={() => navigate("/new")}
+          className="button-primary flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">New Project</span>
         </Button>
