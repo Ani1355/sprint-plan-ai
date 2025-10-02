@@ -231,52 +231,54 @@ export default function MoscowBoard() {
       />
 
       {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+      <div className="sticky top-0 z-10 border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="min-h-[44px] shrink-0">
+                <ArrowLeft className="w-4 h-4 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
-              <div>
-                <h1 className="text-heading-2 font-bold">MoSCoW Prioritization</h1>
-                <p className="text-body-small text-muted-foreground">
-                  Organize features by Must, Should, Could, Won't priority for {projectData.projectName}
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">MoSCoW Prioritization</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                  Organize features by priority for {projectData.projectName}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               <div className="flex items-center gap-2">
                 <Switch 
                   id="mvp-view"
                   checked={showMVPOnly}
                   onCheckedChange={setShowMVPOnly}
                 />
-                <label htmlFor="mvp-view" className="text-body-small flex items-center gap-1">
-                  <Eye className="w-3 h-3" />
-                  MVP View
+                <label htmlFor="mvp-view" className="text-xs sm:text-sm flex items-center gap-1 cursor-pointer">
+                  <Eye className="w-3 h-3" aria-hidden="true" />
+                  <span className="hidden sm:inline">MVP View</span>
+                  <span className="sm:hidden">MVP</span>
                 </label>
               </div>
               
-              <Badge variant="secondary" className="flex items-center gap-1">
-                {mvpCount} MVP Features
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                <span className="hidden sm:inline">{mvpCount} MVP Features</span>
+                <span className="sm:hidden">{mvpCount} MVP</span>
               </Badge>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Warnings */}
-        <div className="mb-6 space-y-4">
+        <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4">
           {mustCount < 4 && (
             <Card className="border-warning bg-warning/10">
-              <CardContent className="py-4">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-warning" />
-                  <p className="text-body-small">
+              <CardContent className="py-3 sm:py-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <p className="text-xs sm:text-sm">
                     <strong>Small scope detected:</strong> Consider adding more Must-have features. Recommended minimum: 4 features.
                   </p>
                 </div>
@@ -286,10 +288,10 @@ export default function MoscowBoard() {
           
           {mustCount > 10 && (
             <Card className="border-error bg-error/10">
-              <CardContent className="py-4">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-error" />
-                  <p className="text-body-small">
+              <CardContent className="py-3 sm:py-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-error flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <p className="text-xs sm:text-sm">
                     <strong>High scope risk:</strong> Consider moving some Must-have features to Should or Could to reduce risk.
                   </p>
                 </div>
@@ -305,7 +307,7 @@ export default function MoscowBoard() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {COLUMNS.map(column => {
               const columnFeatures = getColumnFeatures(column.id);
               const stats = getColumnStats(column.id);

@@ -227,7 +227,7 @@ export default function TechnicalNeeds() {
   const selectedCount = requirements.filter(r => r.selected).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 sm:pb-0">
       {/* Accessibility announcements */}
       <div 
         aria-live="polite" 
@@ -239,47 +239,50 @@ export default function TechnicalNeeds() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+      <div className="sticky top-0 z-10 border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="min-h-[44px] shrink-0">
+                <ArrowLeft className="w-4 h-4 sm:mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
-              <div>
-                <h1 className="text-heading-2 font-bold">Technical Requirements</h1>
-                <p className="text-body-small text-muted-foreground">
-                  Define authentication, integrations, and performance needs for {projectData.projectName}
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">Technical Requirements</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                  Define auth, integrations, and performance needs
                 </p>
               </div>
             </div>
             
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Settings className="w-3 h-3" />
+            <Badge variant="secondary" className="flex items-center gap-1 text-xs shrink-0">
+              <Settings className="w-3 h-3" aria-hidden="true" />
               {selectedCount} Selected
             </Badge>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left Side - Requirements Selection */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <Tabs defaultValue="auth" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="auth" className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  Authentication
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="auth" className="flex items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                  <Shield className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Authentication</span>
+                  <span className="sm:hidden">Auth</span>
                 </TabsTrigger>
-                <TabsTrigger value="integrations" className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  Integrations
+                <TabsTrigger value="integrations" className="flex items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Integrations</span>
+                  <span className="sm:hidden">Integr.</span>
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Performance
+                <TabsTrigger value="performance" className="flex items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Performance</span>
+                  <span className="sm:hidden">Perf.</span>
                 </TabsTrigger>
               </TabsList>
 

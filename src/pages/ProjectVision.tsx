@@ -141,30 +141,31 @@ export default function ProjectVision() {
     <TooltipProvider>
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="border-b border-border bg-card">
-          <div className="max-w-4xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Dashboard
+        <div className="sticky top-0 z-10 border-b border-border bg-card">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="min-h-[44px] shrink-0">
+                  <ArrowLeft className="w-4 h-4 sm:mr-2" aria-hidden="true" />
+                  <span className="hidden sm:inline">Back to Dashboard</span>
                 </Button>
-                <div>
-                  <h1 className="text-heading-2 font-bold">Your Product Vision</h1>
-                  <p className="text-body-small text-muted-foreground">
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">Your Product Vision</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                     Review and refine the AI-generated vision for {projectData.projectName}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="secondary" className={`flex items-center gap-1 ${getConfidenceColor(visionData.confidence)}`}>
-                      {visionData.confidence === "high" && <CheckCircle className="w-3 h-3" />}
-                      {visionData.confidence === "medium" && <Info className="w-3 h-3" />}
-                      {visionData.confidence === "low" && <AlertTriangle className="w-3 h-3" />}
-                      {visionData.confidence} confidence
+                  <TooltipTrigger asChild>
+                    <Badge variant="secondary" className={`flex items-center gap-1 text-xs ${getConfidenceColor(visionData.confidence)}`}>
+                      {visionData.confidence === "high" && <CheckCircle className="w-3 h-3" aria-hidden="true" />}
+                      {visionData.confidence === "medium" && <Info className="w-3 h-3" aria-hidden="true" />}
+                      {visionData.confidence === "low" && <AlertTriangle className="w-3 h-3" aria-hidden="true" />}
+                      <span className="hidden sm:inline">{visionData.confidence} confidence</span>
+                      <span className="sm:hidden">{visionData.confidence}</span>
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -176,22 +177,22 @@ export default function ProjectVision() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Main Editor */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Product Vision Statement
+                  <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <span className="text-base sm:text-lg">Product Vision Statement</span>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isRegenerating}>
-                        <RefreshCw className={`w-4 h-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
-                        Regenerate
+                      <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isRegenerating} className="min-h-[44px]">
+                        <RefreshCw className={`w-4 h-4 sm:mr-2 ${isRegenerating ? 'animate-spin' : ''}`} aria-hidden="true" />
+                        <span className="hidden sm:inline">Regenerate</span>
                       </Button>
-                      <Button onClick={handleSave} disabled={!hasUnsavedChanges} size="sm">
-                        <Save className="w-4 h-4 mr-2" />
-                        Save
+                      <Button onClick={handleSave} disabled={!hasUnsavedChanges} size="sm" className="min-h-[44px]">
+                        <Save className="w-4 h-4 sm:mr-2" aria-hidden="true" />
+                        <span className="hidden sm:inline">Save</span>
                       </Button>
                     </div>
                   </CardTitle>

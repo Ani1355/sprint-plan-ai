@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Clock, FolderOpen, Sparkles, Filter } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { MobileNav } from "@/components/layout/MobileNav";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -87,16 +88,16 @@ const Index = () => {
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header />
         
-        <main className="flex-1 p-6 space-y-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
           {/* Welcome Section */}
           <div className="space-y-2">
-            <h1 className="text-display text-foreground">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
               Welcome back, Alex 👋
             </h1>
-            <p className="text-body text-text-secondary">
+            <p className="text-sm sm:text-base text-text-secondary">
               Here's what's happening with your projects today.
             </p>
           </div>
@@ -106,24 +107,24 @@ const Index = () => {
           ) : (
             <>
               {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {kpiData.map((kpi, index) => (
                   <KPICard 
                     key={kpi.title}
                     {...kpi}
-                    className={`animate-fade-in`}
+                    className="animate-fade-in"
                     style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
                   />
                 ))}
               </div>
 
               {/* Projects Section */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-heading-1 text-foreground">Recent Projects</h2>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground">Recent Projects</h2>
                   <div className="flex items-center gap-3">
                     <Select value={filter} onValueChange={setFilter}>
-                      <SelectTrigger className="w-40">
+                      <SelectTrigger className="w-full sm:w-40">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder="Filter projects" />
                       </SelectTrigger>
@@ -135,14 +136,14 @@ const Index = () => {
                         <SelectItem value="exported">Exported</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button variant="outline" className="button-secondary">
+                    <Button variant="outline" className="button-secondary hidden sm:flex">
                       View All
                     </Button>
                   </div>
                 </div>
 
                 {/* Projects Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                   {filteredProjects.map((project, index) => (
                     <ProjectCard
                       key={project.id}
@@ -157,6 +158,8 @@ const Index = () => {
           )}
         </main>
       </div>
+      
+      <MobileNav />
     </div>
   );
 };
