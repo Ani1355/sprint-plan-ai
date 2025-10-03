@@ -48,139 +48,30 @@ export default function ProjectFeatures() {
   const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
-    // Simulate AI feature generation
-    const generateFeatures = () => {
-      const generatedFeatures: Feature[] = [
-        {
-          id: '1',
-          title: 'User Authentication',
-          description: 'Secure login and registration system with email verification',
-          valueScore: 85,
-          effortScore: 40,
-          category: 'Must',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'Medium'
-        },
-        {
-          id: '2',
-          title: 'Dashboard Overview',
-          description: 'Central hub showing key metrics and recent activity',
-          valueScore: 90,
-          effortScore: 35,
-          category: 'Must',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'Medium'
-        },
-        {
-          id: '3',
-          title: 'Real-time Notifications',
-          description: 'Push notifications for important updates and events',
-          valueScore: 70,
-          effortScore: 60,
-          category: 'Should',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'High'
-        },
-        {
-          id: '4',
-          title: 'Advanced Analytics',
-          description: 'Detailed analytics and reporting dashboard',
-          valueScore: 75,
-          effortScore: 80,
-          category: 'Should',
-          isMVP: false,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'High'
-        },
-        {
-          id: '5',
-          title: 'Mobile App',
-          description: 'Native mobile application for iOS and Android',
-          valueScore: 80,
-          effortScore: 90,
-          category: 'Could',
-          isMVP: false,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'High'
-        },
-        {
-          id: '6',
-          title: 'API Documentation',
-          description: 'Comprehensive API documentation with examples',
-          valueScore: 60,
-          effortScore: 30,
-          category: 'Should',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'Low'
-        },
-        {
-          id: '7',
-          title: 'Team Collaboration',
-          description: 'Multi-user workspace with role-based permissions',
-          valueScore: 85,
-          effortScore: 70,
-          category: 'Must',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'High'
-        },
-        {
-          id: '8',
-          title: 'Export Features',
-          description: 'Export data in multiple formats (PDF, CSV, JSON)',
-          valueScore: 65,
-          effortScore: 25,
-          category: 'Should',
-          isMVP: true,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'Low'
-        },
-        {
-          id: '9',
-          title: 'Dark Mode',
-          description: 'Dark theme option for better user experience',
-          valueScore: 40,
-          effortScore: 15,
-          category: 'Could',
-          isMVP: false,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'Low'
-        },
-        {
-          id: '10',
-          title: 'Third-party Integrations',
-          description: 'Integrate with popular tools and services',
-          valueScore: 75,
-          effortScore: 85,
-          category: 'Could',
-          isMVP: false,
-          votes: { up: 0, down: 0 },
-          estimatedEffort: 'High'
-        }
-      ];
-
-      // Auto-select top 7 features for MVP
-      const sortedByValue = [...generatedFeatures].sort((a, b) => (b.valueScore - b.effortScore) - (a.valueScore - a.effortScore));
-      sortedByValue.slice(0, 7).forEach(feature => {
-        feature.isMVP = true;
+    // Use real AI-generated features from visionData
+    if (visionData.features && Array.isArray(visionData.features)) {
+      const aiFeatures: Feature[] = visionData.features.map((feature: any) => ({
+        ...feature,
+        votes: { up: 0, down: 0 }
+      }));
+      
+      setFeatures(aiFeatures);
+      setIsGenerating(false);
+      
+      toast({
+        title: "Features Loaded",
+        description: `${aiFeatures.length} AI-generated features ranked by value vs effort.`
       });
-
-      return generatedFeatures;
-    };
-
-    setTimeout(() => {
-      setFeatures(generateFeatures());
+    } else {
+      // Fallback if no features in visionData
       setIsGenerating(false);
       toast({
-        title: "Features Generated",
-        description: "AI has generated 10 features ranked by value vs effort."
+        title: "No Features Found",
+        description: "Please go back and regenerate your project vision.",
+        variant: "destructive"
       });
-    }, 2000);
-  }, [projectData, toast]);
+    }
+  }, [visionData, toast]);
 
   const getValueEffortRatio = (feature: Feature) => {
     return feature.valueScore - feature.effortScore;

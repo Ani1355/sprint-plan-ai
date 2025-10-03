@@ -40,11 +40,11 @@ export default function ProjectVision() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    // Generate alternate versions on component mount
+    // Generate meaningful alternate versions based on actual project data
     const alternates = [
-      `Transform how ${projectData.targetAudience[0]} approach their biggest challenges with ${projectData.projectName}'s innovative solution.`,
-      `${projectData.projectName} revolutionizes the ${projectData.targetAudience[0]} experience through intelligent automation and seamless workflow integration.`,
-      `Built for ${projectData.targetAudience.join(" and ")}, ${projectData.projectName} eliminates traditional pain points with cutting-edge technology.`
+      `${projectData.projectName} empowers ${projectData.targetAudience.join(" and ")} to overcome ${projectData.problem.slice(0, 50)}... through ${projectData.magic.slice(0, 40)}...`,
+      `Transform the way ${projectData.targetAudience[0]} work with ${projectData.projectName}'s innovative approach to solving ${projectData.problem.split('.')[0]}.`,
+      `Built specifically for ${projectData.targetAudience.join(", ")}, ${projectData.projectName} delivers ${projectData.magic.split('.')[0]} when you need it most.`
     ];
     setAlternateVersions(alternates);
   }, [projectData]);
@@ -88,22 +88,24 @@ export default function ProjectVision() {
   const handleRegenerate = async () => {
     setIsRegenerating(true);
     
-    // Simulate AI regeneration
-    setTimeout(() => {
-      const newAlternates = [
-        `Next-generation ${projectData.projectName} empowers ${projectData.targetAudience[0]} with unprecedented efficiency and control.`,
-        `Experience the future of ${projectData.targetAudience[0]} productivity with ${projectData.projectName}'s AI-driven platform.`,
-        `${projectData.projectName} redefines what's possible for ${projectData.targetAudience.join(", ")} through intelligent design and seamless integration.`
-      ];
-      setAlternateVersions(newAlternates);
-      setSelectedAlternate(0);
-      setIsRegenerating(false);
-      
-      toast({
-        title: "New Versions Generated",
-        description: "Review the carousel below to see fresh alternatives."
-      });
-    }, 2000);
+    // Generate new contextual alternates based on project data
+    const problemCore = projectData.problem.split('.')[0];
+    const magicCore = projectData.magic.split('.')[0];
+    
+    const newAlternates = [
+      `${projectData.projectName} revolutionizes how ${projectData.targetAudience[0]} handle ${problemCore} by delivering ${magicCore}.`,
+      `Say goodbye to ${problemCore}. ${projectData.projectName} brings ${projectData.targetAudience.join(" and ")} a smarter way forward.`,
+      `For ${projectData.targetAudience.join(", ")} who need ${magicCore}, ${projectData.projectName} is the answer to ${problemCore}.`
+    ];
+    
+    setAlternateVersions(newAlternates);
+    setSelectedAlternate(0);
+    setIsRegenerating(false);
+    
+    toast({
+      title: "New Versions Generated",
+      description: "Review the carousel below to see fresh alternatives."
+    });
   };
 
   const useAlternate = (index: number) => {

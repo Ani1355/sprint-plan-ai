@@ -28,7 +28,7 @@ serve(async (req) => {
     // Construct a detailed prompt for PRD generation
     const systemPrompt = `You are an expert product strategist and PRD writer. Generate a comprehensive, professional product vision and requirements document based on user inputs. Focus on clarity, actionability, and strategic insight.`;
 
-    const userPrompt = `Create a detailed Product Requirements Document (PRD) vision statement for the following product:
+    const userPrompt = `Create a detailed Product Requirements Document (PRD) for the following product:
 
 Project Name: ${projectData.projectName}
 Target Audience: ${projectData.targetAudience.join(", ")}
@@ -39,18 +39,36 @@ ${projectData.competitors ? `Competitors: ${projectData.competitors}` : ''}
 ${projectData.budget ? `Budget: ${projectData.budget}` : ''}
 ${projectData.teamSize ? `Team Size: ${projectData.teamSize}` : ''}
 
-Generate:
-1. A compelling product vision statement (2-3 sentences that clearly articulate the value proposition)
-2. A list of 15 prioritized features (mix of must-have MVP features and future enhancements)
-3. Key user actions (primary actions users will take)
-4. Success metrics (how to measure product success)
+Generate exactly 15 prioritized features ranked by value/effort ratio. Each feature MUST include:
+- Unique numeric id (1-15)
+- Concise title (3-6 words, specific to this project)
+- Clear description (1-2 sentences explaining user benefit)
+- valueScore (0-100, business/user value)
+- effortScore (0-100, development complexity)
+- category: Top 5 as "Must", next 5 as "Should", next 3 as "Could", last 2 as "Won't"
+- estimatedEffort: "Low" if effortScore < 40, "Medium" if 40-70, "High" if > 70
+- isMVP: true for top 7 features by (valueScore - effortScore), false otherwise
 
-Return your response in the following JSON format:
+IMPORTANT: Features must be specific to this project and target audience, not generic templates.
+
+Return ONLY valid JSON in this exact format:
 {
-  "valueProposition": "The main vision statement",
-  "features": ["feature 1", "feature 2", ...],
-  "primaryUserActions": ["action 1", "action 2", ...],
-  "successMetrics": ["metric 1", "metric 2", ...]
+  "valueProposition": "2-3 sentence compelling vision statement",
+  "primaryUserAction": "The main action users take",
+  "confidence": "high",
+  "features": [
+    {
+      "id": "1",
+      "title": "Specific Feature Name",
+      "description": "Clear benefit for the user",
+      "valueScore": 85,
+      "effortScore": 40,
+      "category": "Must",
+      "estimatedEffort": "Medium",
+      "isMVP": true
+    }
+  ],
+  "successMetrics": ["Specific measurable metric 1", "Specific measurable metric 2", "Specific measurable metric 3"]
 }`;
 
     // Call Lovable AI Gateway with Google Gemini
@@ -127,17 +145,21 @@ Return your response in the following JSON format:
     }
 
     // Calculate confidence based on content quality
-    const confidence = parsedContent.valueProposition.length > 50 && parsedContent.features.length >= 10 
+    const hasValidFeatures = Array.isArray(parsedContent.features) && 
+                             parsedContent.features.length >= 10 &&
+                             parsedContent.features.every((f: any) => f.id && f.title && f.description);
+    
+    const confidence = parsedContent.valueProposition?.length > 50 && hasValidFeatures
       ? 'high' 
-      : parsedContent.valueProposition.length > 20 
+      : parsedContent.valueProposition?.length > 20 
         ? 'medium' 
         : 'low';
 
     const result = {
-      valueProposition: parsedContent.valueProposition,
-      confidence,
+      valueProposition: parsedContent.valueProposition || '',
+      primaryUserAction: parsedContent.primaryUserAction || '',
+      confidence: parsedContent.confidence || confidence,
       features: parsedContent.features || [],
-      primaryUserActions: parsedContent.primaryUserActions || [],
       successMetrics: parsedContent.successMetrics || [],
       aiGenerated: true,
       timestamp: new Date().toISOString(),
