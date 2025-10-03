@@ -77,7 +77,7 @@ export function ProjectCard({
             {owner?.avatarUrl ? (
               <AvatarImage src={owner.avatarUrl} alt={owner.name} />
             ) : (
-              <AvatarFallback aria-label={owner?.name || 'Project'}>{(owner?.name || title).slice(0,2).toUpperCase()}</AvatarFallback>
+              <AvatarFallback aria-label={owner?.name || 'Unassigned'}>{(owner?.name || 'Unassigned').slice(0,2).toUpperCase()}</AvatarFallback>
             )}
           </Avatar>
           <div className="hidden sm:flex flex-col">
@@ -161,12 +161,16 @@ export function ProjectCard({
 
         {typeof progress === 'number' && (
           <div className="pt-1">
-            <Progress value={progress} aria-label="Project progress" className="h-2" />
+            <Progress 
+              value={Math.max(0, Math.min(100, progress))} 
+              aria-label="Project progress" 
+              className="h-2" 
+            />
           </div>
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-top border-border/50 text-xs">
+        <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
           <Badge className={cn("px-2 py-0.5 inline-flex items-center gap-1", statusInfo.className)} aria-label={`Status: ${statusInfo.label}`}>
             <statusInfo.Icon className="w-3 h-3" aria-hidden="true" />
             {statusInfo.label}

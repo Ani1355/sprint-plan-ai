@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Clock, FolderOpen, Sparkles, Filter, ChevronRight } from "lucide-react";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -90,6 +91,18 @@ const mockProjects = [
 const Index = () => {
   const [filter, setFilter] = useState("all");
   const [projects] = useState(mockProjects);
+  const navigate = useNavigate();
+
+  const handleHomeClick = () => {
+    navigate("/");
+  };
+
+  const handleHomeKeyDown: React.KeyboardEventHandler<HTMLButtonElement> = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      navigate("/");
+    }
+  };
 
   // Show empty state if no projects
   const showEmptyState = projects.length === 0;
@@ -106,7 +119,15 @@ const Index = () => {
           {/* Breadcrumbs + Welcome */}
           <div className="flex flex-col gap-2">
             <nav className="flex items-center text-xs sm:text-sm text-text-muted gap-1" aria-label="Breadcrumb">
-              <span className="hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 cursor-pointer" tabIndex={0}>Home</span>
+              <button
+                type="button"
+                aria-label="Go to home"
+                onClick={handleHomeClick}
+                onKeyDown={handleHomeKeyDown}
+                className="hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 cursor-pointer"
+              >
+                Home
+              </button>
               <ChevronRight className="w-3 h-3" aria-hidden="true" />
               <span className="text-foreground font-medium px-1">Dashboard</span>
             </nav>

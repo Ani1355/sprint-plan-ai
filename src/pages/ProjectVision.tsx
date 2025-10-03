@@ -25,19 +25,18 @@ export default function ProjectVision() {
   
   const { projectData, visionData } = location.state || {};
   
-  // Redirect if no data
-  if (!projectData || !visionData) {
-    return <Navigate to="/" replace />;
-  }
+  // Ensure hooks are always called; redirect via effect to satisfy hooks rules
+  useEffect(() => {
+    if (!projectData || !visionData) {
+      navigate("/", { replace: true });
+    }
+  }, [projectData, visionData, navigate]);
 
   const [currentVision, setCurrentVision] = useState(visionData.valueProposition);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [editHistory, setEditHistory] = useState([visionData.valueProposition]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  useEffect(() => {
-    // No alternate versions; nothing to initialize here currently
-  }, [projectData]);
 
   const getConfidenceColor = (confidence: string) => {
     switch (confidence) {

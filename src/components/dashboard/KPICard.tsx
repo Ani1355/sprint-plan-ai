@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -17,6 +18,7 @@ interface KPICardProps {
 }
 
 export function KPICard({ title, value, change, icon: Icon, data, className, style }: KPICardProps) {
+  const gradientId = `kpiGradient-${useId()}`;
   return (
     <div className={cn("card-elevated p-4 sm:p-6 animate-fade-in", className)} style={style}>
       <div className="flex items-center justify-between gap-3">
@@ -38,7 +40,7 @@ export function KPICard({ title, value, change, icon: Icon, data, className, sty
           >
             <AreaChart data={data} margin={{ left: 0, right: 0, top: 4, bottom: 0 }}>
               <defs>
-                <linearGradient id="kpiGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                 </linearGradient>
@@ -47,7 +49,7 @@ export function KPICard({ title, value, change, icon: Icon, data, className, sty
                 type="monotone"
                 dataKey="value"
                 stroke="hsl(var(--primary))"
-                fill="url(#kpiGradient)"
+                fill={`url(#${gradientId})`}
                 strokeWidth={2}
                 isAnimationActive
                 dot={false}
