@@ -1,5 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Area, AreaChart } from "recharts";
 
 interface KPICardProps {
   title: string;
@@ -9,11 +11,12 @@ interface KPICardProps {
     trend: "up" | "down" | "neutral";
   };
   icon: LucideIcon;
+  data?: { value: number }[];
   className?: string;
   style?: React.CSSProperties;
 }
 
-export function KPICard({ title, value, change, icon: Icon, className, style }: KPICardProps) {
+export function KPICard({ title, value, change, icon: Icon, data, className, style }: KPICardProps) {
   return (
     <div className={cn("card-elevated p-4 sm:p-6 animate-fade-in", className)} style={style}>
       <div className="flex items-center justify-between gap-3">
@@ -26,6 +29,36 @@ export function KPICard({ title, value, change, icon: Icon, className, style }: 
         </div>
       </div>
       
+      {data && data.length > 0 && (
+        <div className="mt-3 sm:mt-4">
+          <ChartContainer
+            config={{ series: { label: title, color: "hsl(var(--primary))" } }}
+            className="h-14 w-full"
+            aria-label={`${title} trend sparkline`}
+          >
+            <AreaChart data={data} margin={{ left: 0, right: 0, top: 4, bottom: 0 }}>
+              <defs>
+                <linearGradient id="kpiGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="hsl(var(--primary))"
+                fill="url(#kpiGradient)"
+                strokeWidth={2}
+                isAnimationActive
+                dot={false}
+                activeDot={{ r: 3 }}
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            </AreaChart>
+          </ChartContainer>
+        </div>
+      )}
+
       {change && (
         <div className="mt-3 sm:mt-4 flex items-center gap-2">
           <span className={cn(

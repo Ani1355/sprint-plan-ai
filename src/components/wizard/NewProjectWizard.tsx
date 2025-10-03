@@ -20,8 +20,6 @@ export interface ProjectData {
   magic: string;
   platforms?: string[];
   competitors?: string;
-  budget?: string;
-  teamSize?: string;
 }
 
 interface NewProjectWizardProps {
@@ -46,9 +44,7 @@ export function NewProjectWizard({ open, onClose }: NewProjectWizardProps) {
     problem: "",
     magic: "",
     platforms: [],
-    competitors: "",
-    budget: "",
-    teamSize: ""
+    competitors: ""
   });
   const [showAIGeneration, setShowAIGeneration] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<"saving" | "saved" | "error" | null>(null);
@@ -143,9 +139,7 @@ export function NewProjectWizard({ open, onClose }: NewProjectWizardProps) {
         return <OptionalDetailsStep 
           data={{
             platforms: projectData.platforms,
-            competitors: projectData.competitors,
-            budget: projectData.budget,
-            teamSize: projectData.teamSize
+            competitors: projectData.competitors
           }}
           onChange={updateProjectData}
         />;

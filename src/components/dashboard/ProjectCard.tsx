@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreVertical, FolderOpen, Copy, Download, Trash2, Calendar, Tag } from "lucide-react";
+import { MoreVertical, FolderOpen, Copy, Download, Trash2, Calendar, Tag, CheckCircle2, Clock, FileText, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 interface ProjectCardProps {
   id: string;
@@ -21,14 +23,19 @@ interface ProjectCardProps {
   thumbnail?: string;
   onClick?: () => void;
   style?: React.CSSProperties;
+  owner?: { name: string; avatarUrl?: string };
+  priority?: "high" | "medium" | "low";
+  progress?: number;
 }
 
 const statusConfig = {
-  draft: { label: "Draft", className: "bg-muted text-muted-foreground" },
-  "in-progress": { label: "In Progress", className: "bg-warning/10 text-warning border-warning/20" },
-  completed: { label: "Completed", className: "bg-success/10 text-success border-success/20" },
-  exported: { label: "Exported", className: "bg-primary/10 text-primary border-primary/20" },
+  draft: { label: "Draft", className: "bg-muted text-muted-foreground", Icon: FileText },
+  "in-progress": { label: "In Progress", className: "bg-warning/10 text-warning border-warning/20", Icon: Clock },
+  completed: { label: "Completed", className: "bg-success/10 text-success border-success/20", Icon: CheckCircle2 },
+  exported: { label: "Exported", className: "bg-primary/10 text-primary border-primary/20", Icon: UploadCloud },
 };
+
+// No left priority stripe; keep simple unified border
 
 export function ProjectCard({ 
   title, 
@@ -38,7 +45,10 @@ export function ProjectCard({
   tags = [], 
   thumbnail, 
   onClick,
-  style 
+  style,
+  owner,
+  priority = "medium",
+  progress,
 }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -49,7 +59,8 @@ export function ProjectCard({
       className={cn(
         "group relative bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-200",
         "hover:shadow-medium hover:border-primary/20 hover:-translate-y-1 active:scale-95",
-        isHovered && "shadow-medium border-primary/20 -translate-y-1"
+        isHovered && "shadow-medium border-primary/20 -translate-y-1",
+        (status === "completed" || status === "exported") && "bg-muted/20"
       )}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -60,12 +71,25 @@ export function ProjectCard({
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
     >
       {/* Thumbnail */}
-      <div className="w-full h-24 sm:h-32 bg-gradient-subtle rounded-lg sm:rounded-xl mb-3 sm:mb-4 flex items-center justify-center overflow-hidden">
+      <div className="w-full h-24 sm:h-32 bg-gradient-subtle rounded-lg sm:rounded-xl mb-3 sm:mb-4 flex items-center justify-between overflow-hidden px-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            {owner?.avatarUrl ? (
+              <AvatarImage src={owner.avatarUrl} alt={owner.name} />
+            ) : (
+              <AvatarFallback aria-label={owner?.name || 'Project'}>{(owner?.name || title).slice(0,2).toUpperCase()}</AvatarFallback>
+            )}
+          </Avatar>
+          <div className="hidden sm:flex flex-col">
+            <span className="text-sm font-medium text-card-foreground">{owner?.name || 'Unassigned'}</span>
+            <span className="text-xs text-text-muted">Owner</span>
+          </div>
+        </div>
         {thumbnail ? (
-          <img src={thumbnail} alt={title} className="w-full h-full object-cover" />
+          <img src={thumbnail} alt={title} className="h-12 w-20 object-cover rounded-md" />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gradient-brand/10">
-            <FolderOpen className="w-8 h-8 text-primary" />
+          <div className="flex items-center justify-center h-10 w-10 rounded-md bg-gradient-brand/10">
+            <FolderOpen className="w-5 h-5 text-primary" aria-hidden="true" />
           </div>
         )}
       </div>
@@ -135,14 +159,21 @@ export function ProjectCard({
           </div>
         )}
 
+        {typeof progress === 'number' && (
+          <div className="pt-1">
+            <Progress value={progress} aria-label="Project progress" className="h-2" />
+          </div>
+        )}
+
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
-          <Badge className={statusInfo.className}>
+        <div className="flex items-center justify-between pt-2 border-top border-border/50 text-xs">
+          <Badge className={cn("px-2 py-0.5 inline-flex items-center gap-1", statusInfo.className)} aria-label={`Status: ${statusInfo.label}`}>
+            <statusInfo.Icon className="w-3 h-3" aria-hidden="true" />
             {statusInfo.label}
           </Badge>
           <div className="flex items-center gap-1 text-text-muted">
             <Calendar className="w-3 h-3" aria-hidden="true" />
-            <time>{lastUpdated}</time>
+            <time aria-label="Last updated">{lastUpdated}</time>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Clock, FolderOpen, Sparkles, Filter } from "lucide-react";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
-import { MobileNav } from "@/components/layout/MobileNav";
+import { Clock, FolderOpen, Sparkles, Filter, ChevronRight } from "lucide-react";
 import { KPICard } from "@/components/dashboard/KPICard";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Button } from "@/components/ui/button";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Line, LineChart, XAxis } from "recharts";
 import {
   Select,
   SelectContent,
@@ -22,18 +22,21 @@ const kpiData = [
     value: "2.4 hrs",
     change: { value: "32% faster", trend: "up" as const },
     icon: Clock,
+    data: [2.9, 2.8, 2.7, 2.6, 2.5, 2.4].map((v) => ({ value: v })),
   },
   {
     title: "Projects Created",
     value: "24",
     change: { value: "8 this month", trend: "up" as const },
     icon: FolderOpen,
+    data: [10, 12, 15, 16, 20, 24].map((v) => ({ value: v })),
   },
   {
     title: "AI Suggestions Used",
     value: "156",
     change: { value: "12% more", trend: "up" as const },
     icon: Sparkles,
+    data: [120, 118, 130, 142, 150, 156].map((v) => ({ value: v })),
   },
 ];
 
@@ -45,6 +48,9 @@ const mockProjects = [
     status: "in-progress" as const,
     lastUpdated: "2 hours ago",
     tags: ["Fintech", "Mobile", "UX"],
+    owner: { name: "Priya Patel" },
+    priority: "high" as const,
+    progress: 64,
   },
   {
     id: "2", 
@@ -53,6 +59,9 @@ const mockProjects = [
     status: "draft" as const,
     lastUpdated: "1 day ago",
     tags: ["AI", "Support", "Automation"],
+    owner: { name: "Jordan Lee" },
+    priority: "medium" as const,
+    progress: 15,
   },
   {
     id: "3",
@@ -61,6 +70,9 @@ const mockProjects = [
     status: "completed" as const,
     lastUpdated: "3 days ago",
     tags: ["Analytics", "Dashboard", "E-commerce"],
+    owner: { name: "Alex Morgan" },
+    priority: "low" as const,
+    progress: 100,
   },
   {
     id: "4",
@@ -69,6 +81,9 @@ const mockProjects = [
     status: "exported" as const,
     lastUpdated: "1 week ago",
     tags: ["Social", "Integration", "Marketing"],
+    owner: { name: "Riya Singh" },
+    priority: "medium" as const,
+    progress: 100,
   },
 ];
 
@@ -87,19 +102,22 @@ const Index = () => {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
-      
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
-          {/* Welcome Section */}
-          <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
-              Welcome back, Alex 👋
-            </h1>
-            <p className="text-sm sm:text-base text-text-secondary">
-              Here's what's happening with your projects today.
-            </p>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
+          {/* Breadcrumbs + Welcome */}
+          <div className="flex flex-col gap-2">
+            <nav className="flex items-center text-xs sm:text-sm text-text-muted gap-1" aria-label="Breadcrumb">
+              <span className="hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring rounded px-1 cursor-pointer" tabIndex={0}>Home</span>
+              <ChevronRight className="w-3 h-3" aria-hidden="true" />
+              <span className="text-foreground font-medium px-1">Dashboard</span>
+            </nav>
+            <div className="space-y-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground">
+                Welcome back, Alex 👋
+              </h1>
+              <p className="text-sm sm:text-base text-text-secondary">
+                Here's what's happening with your projects today.
+              </p>
+            </div>
           </div>
 
           {showEmptyState ? (
@@ -118,13 +136,36 @@ const Index = () => {
                 ))}
               </div>
 
+              {/* Mini Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="card-elevated p-4 sm:p-6 lg:col-span-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-medium text-text-secondary">Last 6 periods</p>
+                    <Select value={"6"} onValueChange={() => {}}>
+                      <SelectTrigger className="w-36 min-h-[40px]"><SelectValue placeholder="Timeframe" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="6">Last 6</SelectItem>
+                        <SelectItem value="12">Last 12</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <ChartContainer config={{ kpi: { label: "Projects", color: "hsl(var(--primary))" } }} className="h-28">
+                    <LineChart data={[10,12,15,16,20,24].map((v,i)=>({i, value:v}))} margin={{left:0,right:8,top:4,bottom:0}}>
+                      <XAxis dataKey="i" hide />
+                      <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                      <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                    </LineChart>
+                  </ChartContainer>
+                </div>
+              </div>
+
               {/* Projects Section */}
               <div className="space-y-4 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground">Recent Projects</h2>
                   <div className="flex items-center gap-3">
                     <Select value={filter} onValueChange={setFilter}>
-                      <SelectTrigger className="w-full sm:w-40">
+                      <SelectTrigger className="w-full sm:w-48 min-h-[44px]">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder="Filter projects" />
                       </SelectTrigger>
@@ -136,7 +177,7 @@ const Index = () => {
                         <SelectItem value="exported">Exported</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button variant="outline" className="button-secondary hidden sm:flex">
+                    <Button variant="outline" className="button-secondary hidden sm:flex min-h-[44px]">
                       View All
                     </Button>
                   </div>
@@ -147,7 +188,7 @@ const Index = () => {
                   {filteredProjects.map((project, index) => (
                     <ProjectCard
                       key={project.id}
-                      {...project}
+                    {...project}
                       onClick={() => console.log(`Opening project ${project.id}`)}
                       style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties}
                     />
@@ -156,10 +197,7 @@ const Index = () => {
               </div>
             </>
           )}
-        </main>
-      </div>
-      
-      <MobileNav />
+      </main>
     </div>
   );
 };

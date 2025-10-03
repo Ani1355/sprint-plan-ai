@@ -9,8 +9,6 @@ import { Settings, Lightbulb, X } from "lucide-react";
 interface OptionalDetailsData {
   platforms?: string[];
   competitors?: string;
-  budget?: string;
-  teamSize?: string;
 }
 
 interface OptionalDetailsStepProps {
@@ -27,21 +25,6 @@ const PLATFORM_OPTIONS = [
   "API/SDK"
 ];
 
-const BUDGET_OPTIONS = [
-  "Under $10k",
-  "$10k - $50k",
-  "$50k - $100k", 
-  "$100k - $250k",
-  "$250k+"
-];
-
-const TEAM_SIZE_OPTIONS = [
-  "Solo founder",
-  "2-3 people",
-  "4-10 people",
-  "11-25 people",
-  "26+ people"
-];
 
 export function OptionalDetailsStep({ data, onChange }: OptionalDetailsStepProps) {
   const togglePlatform = (platform: string) => {
@@ -55,8 +38,6 @@ export function OptionalDetailsStep({ data, onChange }: OptionalDetailsStepProps
   const fillExampleData = () => {
     onChange("platforms", ["Web App", "Mobile iOS"]);
     onChange("competitors", "Figma, Canva, Adobe XD");
-    onChange("budget", "$10k - $50k");
-    onChange("teamSize", "2-3 people");
   };
 
   return (
@@ -132,47 +113,6 @@ export function OptionalDetailsStep({ data, onChange }: OptionalDetailsStepProps
           />
         </div>
 
-        {/* Budget Range */}
-        <div>
-          <Label className="text-body-small font-medium">Development Budget</Label>
-          <p className="text-xs text-muted-foreground mt-1 mb-3">
-            Rough budget range for initial development
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {BUDGET_OPTIONS.map((budget) => (
-              <Button
-                key={budget}
-                variant={data.budget === budget ? "default" : "outline"}
-                size="sm"
-                onClick={() => onChange("budget", budget)}
-                className="justify-start text-xs"
-              >
-                {budget}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Team Size */}
-        <div>
-          <Label className="text-body-small font-medium">Team Size</Label>
-          <p className="text-xs text-muted-foreground mt-1 mb-3">
-            How many people will work on this project?
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {TEAM_SIZE_OPTIONS.map((size) => (
-              <Button
-                key={size}
-                variant={data.teamSize === size ? "default" : "outline"}
-                size="sm"
-                onClick={() => onChange("teamSize", size)}
-                className="justify-start text-xs"
-              >
-                {size}
-              </Button>
-            ))}
-          </div>
-        </div>
 
         {/* Example Helper */}
         <div className="bg-muted/30 rounded-lg p-4 space-y-3">

@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+ 
 import { 
   ArrowLeft, 
   Save, 
@@ -14,9 +14,7 @@ import {
   AlertTriangle, 
   Info,
   History,
-  Flag,
-  ChevronLeft,
-  ChevronRight
+  Flag
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,20 +31,12 @@ export default function ProjectVision() {
   }
 
   const [currentVision, setCurrentVision] = useState(visionData.valueProposition);
-  const [alternateVersions, setAlternateVersions] = useState<string[]>([]);
-  const [selectedAlternate, setSelectedAlternate] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [editHistory, setEditHistory] = useState([visionData.valueProposition]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    // Generate meaningful alternate versions based on actual project data
-    const alternates = [
-      `${projectData.projectName} empowers ${projectData.targetAudience.join(" and ")} to overcome ${projectData.problem.slice(0, 50)}... through ${projectData.magic.slice(0, 40)}...`,
-      `Transform the way ${projectData.targetAudience[0]} work with ${projectData.projectName}'s innovative approach to solving ${projectData.problem.split('.')[0]}.`,
-      `Built specifically for ${projectData.targetAudience.join(", ")}, ${projectData.projectName} delivers ${projectData.magic.split('.')[0]} when you need it most.`
-    ];
-    setAlternateVersions(alternates);
+    // No alternate versions; nothing to initialize here currently
   }, [projectData]);
 
   const getConfidenceColor = (confidence: string) => {
@@ -87,30 +77,16 @@ export default function ProjectVision() {
 
   const handleRegenerate = async () => {
     setIsRegenerating(true);
-    
-    // Generate new contextual alternates based on project data
     const problemCore = projectData.problem.split('.')[0];
     const magicCore = projectData.magic.split('.')[0];
-    
-    const newAlternates = [
-      `${projectData.projectName} revolutionizes how ${projectData.targetAudience[0]} handle ${problemCore} by delivering ${magicCore}.`,
-      `Say goodbye to ${problemCore}. ${projectData.projectName} brings ${projectData.targetAudience.join(" and ")} a smarter way forward.`,
-      `For ${projectData.targetAudience.join(", ")} who need ${magicCore}, ${projectData.projectName} is the answer to ${problemCore}.`
-    ];
-    
-    setAlternateVersions(newAlternates);
-    setSelectedAlternate(0);
-    setIsRegenerating(false);
-    
-    toast({
-      title: "New Versions Generated",
-      description: "Review the carousel below to see fresh alternatives."
-    });
-  };
-
-  const useAlternate = (index: number) => {
-    setCurrentVision(alternateVersions[index]);
+    const regenerated = `${projectData.projectName} empowers ${projectData.targetAudience.join(", ")} by solving ${problemCore} with ${magicCore}.`;
+    setCurrentVision(regenerated);
     setHasUnsavedChanges(true);
+    setIsRegenerating(false);
+    toast({
+      title: "Vision Regenerated",
+      description: "A fresh vision statement has been generated. Review and save if you like."
+    });
   };
 
   const revertToVersion = (version: string) => {
@@ -245,44 +221,7 @@ export default function ProjectVision() {
                 </CardContent>
               </Card>
 
-              {/* Alternate Versions Carousel */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Alternative Versions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-body-small text-muted-foreground">
-                        Version {selectedAlternate + 1} of {alternateVersions.length}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => setSelectedAlternate(prev => prev > 0 ? prev - 1 : alternateVersions.length - 1)}
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => setSelectedAlternate(prev => prev < alternateVersions.length - 1 ? prev + 1 : 0)}
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="bg-muted/30 rounded-lg p-4">
-                      <p className="text-body mb-3">{alternateVersions[selectedAlternate]}</p>
-                      <Button variant="outline" size="sm" onClick={() => useAlternate(selectedAlternate)}>
-                        Use This Version
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              
             </div>
 
             {/* Sidebar */}
