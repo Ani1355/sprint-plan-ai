@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { ProjectData } from "./NewProjectWizard";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AIGenerationModalProps {
   open: boolean;
@@ -35,50 +36,54 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
 
     const runGeneration = async () => {
       try {
+        // Start progress animation
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+          setProgress(prev => {
+            const newProgress = Math.min(prev + 1, 95);
+            return newProgress;
+          });
+        }, 100);
+
+        // Animate through stages
         for (let i = 0; i < GENERATION_STAGES.length; i++) {
           setCurrentStage(i);
-          
-          // Smooth progress animation
-          const stageProgress = ((i + 1) / GENERATION_STAGES.length) * 100;
-          const startProgress = (i / GENERATION_STAGES.length) * 100;
-          
-          const progressInterval = setInterval(() => {
-            setProgress(prev => {
-              const newProgress = Math.min(prev + 2, stageProgress);
-              if (newProgress >= stageProgress) {
-                clearInterval(progressInterval);
-              }
-              return newProgress;
-            });
-          }, 50);
-
-          // Wait for stage duration
-          await new Promise(resolve => setTimeout(resolve, GENERATION_STAGES[i].duration));
-          clearInterval(progressInterval);
-          setProgress(stageProgress);
+          await new Promise(resolve => setTimeout(resolve, GENERATION_STAGES[i].duration / 2));
         }
 
-        // Simulate AI generation result
-        const mockVisionData = {
-          valueProposition: `${projectData.projectName} empowers ${projectData.targetAudience.join(" and ")} to overcome ${projectData.problem.slice(0, 50)}... through ${projectData.magic.slice(0, 50)}...`,
-          confidence: Math.random() > 0.3 ? "high" : Math.random() > 0.1 ? "medium" : "low",
-          features: [
-            "User authentication and onboarding",
-            "Core workflow automation",
-            "Real-time collaboration tools",
-            "Analytics dashboard",
-            "Mobile responsive design"
-          ],
-          aiGenerated: true,
-          timestamp: new Date().toISOString()
-        };
+        // Call the AI edge function
+        const { data: functionData, error: functionError } = await supabase.functions.invoke('generate-prd', {
+          body: { projectData }
+        });
 
-        setTimeout(() => {
-          onComplete(mockVisionData);
-        }, 500);
+        clearInterval(progressInterval);
+
+        if (functionError) {
+          console.error('Edge function error:', functionError);
+          throw new Error(functionError.message || 'Failed to generate PRD');
+        }
+
+        if (!functionData) {
+          throw new Error('No data returned from AI generation');
+        }
+
+        // Complete progress
+        setProgress(100);
+
+        // Show completion briefly before transitioning
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        onComplete(functionData);
 
       } catch (err) {
-        setError("AI generation failed. This might be due to high demand or a temporary issue.");
+        console.error('AI generation error:', err);
+        setError(
+          err instanceof Error && err.message.includes('Rate limit') 
+            ? "Rate limit exceeded. Please try again in a moment."
+            : err instanceof Error && err.message.includes('credits')
+              ? "AI credits exhausted. Please contact support."
+              : "AI generation failed. Please try again or continue manually."
+        );
       }
     };
 
