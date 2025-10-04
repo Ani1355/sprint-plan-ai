@@ -111,7 +111,7 @@ export function NewProjectWizard({ open, onClose }: NewProjectWizardProps) {
 
   const handleAIComplete = (visionData: any) => {
     setShowAIGeneration(false);
-    navigate("/project/vision", { state: { projectData, visionData } });
+    navigate("/project/vision", { state: { projectData, visionData, projectId: visionData.projectId } });
   };
 
   const handleClose = () => {

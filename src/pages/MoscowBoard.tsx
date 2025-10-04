@@ -67,10 +67,9 @@ export default function MoscowBoard() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { projectData, visionData, features: initialFeatures, projectId } = location.state || {};
   
-  const { projectData, visionData, features: initialFeatures } = location.state || {};
-  
-  if (!projectData || !visionData || !initialFeatures) {
+  if (!projectData || !visionData || !initialFeatures || !projectId) {
     return <Navigate to="/" replace />;
   }
 
@@ -212,7 +211,8 @@ export default function MoscowBoard() {
       state: { 
         projectData, 
         visionData,
-        features: features
+        features: features,
+        projectId
       }
     });
   };

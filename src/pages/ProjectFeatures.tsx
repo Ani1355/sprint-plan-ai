@@ -36,9 +36,9 @@ export default function ProjectFeatures() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { projectData, visionData } = location.state || {};
+  const { projectData, visionData, projectId } = location.state || {};
   
-  if (!projectData || !visionData) {
+  if (!projectData || !visionData || !projectId) {
     return <Navigate to="/" replace />;
   }
 
@@ -133,7 +133,8 @@ export default function ProjectFeatures() {
       state: { 
         projectData, 
         visionData,
-        features: features
+        features: features,
+        projectId
       }
     });
   };

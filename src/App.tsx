@@ -9,6 +9,8 @@ import ProjectVision from "./pages/ProjectVision";
 import ProjectFeatures from "./pages/ProjectFeatures";
 import MoscowBoard from "./pages/MoscowBoard";
 import TechnicalNeeds from "./pages/TechnicalNeeds";
+import JourneyMap from "./pages/JourneyMap";
+import PhaseSummary from "./pages/PhaseSummary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/project/features" element={<ProjectFeatures />} />
           <Route path="/project/moscow" element={<MoscowBoard />} />
           <Route path="/project/technical-needs" element={<TechnicalNeeds />} />
+          <Route path="/project/journey-map" element={<JourneyMap />} />
+          <Route path="/project/summary" element={<PhaseSummary />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

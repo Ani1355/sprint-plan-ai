@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -46,11 +47,13 @@ export default function TechnicalNeeds() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { projectData, visionData, features } = location.state || {};
+  const { projectData, visionData, features, projectId } = location.state || {};
   
-  if (!projectData || !visionData || !features) {
+  if (!projectData || !visionData || !features || !projectId) {
     return <Navigate to="/" replace />;
   }
+
+  const [loading, setLoading] = useState(false);
 
   const [requirements, setRequirements] = useState<TechnicalRequirement[]>([
     // Authentication
@@ -200,28 +203,52 @@ export default function TechnicalNeeds() {
     return requirements.filter(req => req.type === type);
   };
 
-  const handleProceed = () => {
-    const selectedRequirements = requirements.filter(r => r.selected);
-    
-    // Auto-save technical needs
-    localStorage.setItem('technicalNeeds', JSON.stringify({
-      requirements: selectedRequirements,
-      performancePriority,
-      architecturePreview
-    }));
-    
-    navigate("/project/journey-map", { 
-      state: { 
-        projectData, 
-        visionData,
-        features,
-        technicalNeeds: {
-          requirements: selectedRequirements,
-          performancePriority,
-          architecturePreview
-        }
+  const handleProceed = async () => {
+    setLoading(true);
+    try {
+      const selectedRequirements = requirements.filter(r => r.selected);
+      
+      // Save technical requirements to database
+      const reqsData = selectedRequirements.map(req => ({
+        project_id: projectId,
+        requirement_type: req.type,
+        value: req.label
+      }));
+
+      if (reqsData.length > 0) {
+        // Delete existing requirements first
+        await supabase
+          .from("technical_requirements")
+          .delete()
+          .eq("project_id", projectId);
+
+        // Insert new requirements
+        const { error } = await supabase
+          .from("technical_requirements")
+          .insert(reqsData);
+
+        if (error) throw error;
       }
-    });
+
+      // Log activity
+      await supabase.from("activity_logs").insert({
+        project_id: projectId,
+        actor_id: (await supabase.auth.getUser()).data.user?.id,
+        action: "technical_requirements_saved",
+        payload: { count: reqsData.length }
+      });
+
+      navigate("/project/journey-map", { state: { projectId } });
+    } catch (error: any) {
+      console.error("Error saving technical requirements:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save technical requirements",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const selectedCount = requirements.filter(r => r.selected).length;

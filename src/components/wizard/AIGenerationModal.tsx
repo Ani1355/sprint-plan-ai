@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { ProjectData } from "./NewProjectWizard";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AIGenerationModalProps {
   open: boolean;
@@ -25,6 +27,8 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
@@ -73,7 +77,78 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
         // Show completion briefly before transitioning
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        onComplete(functionData);
+        // Save project to database
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (!user) {
+            toast({
+              title: "Authentication Required",
+              description: "Please sign in to save your project.",
+              variant: "destructive"
+            });
+            navigate("/");
+            return;
+          }
+
+          // Create project
+          const { data: project, error: projectError } = await supabase
+            .from("projects")
+            .insert({
+              owner_id: user.id,
+              title: projectData.projectName,
+              target_audience: projectData.targetAudience,
+              problem_statement: projectData.problem,
+              magic_moment: projectData.magic,
+              platforms: projectData.platforms,
+              competitors: projectData.competitors,
+              value_proposition: functionData.valueProposition,
+              primary_user_action: functionData.primaryUserAction,
+              status: "draft"
+            })
+            .select()
+            .single();
+
+          if (projectError) throw projectError;
+
+          // Save features
+          if (functionData.features && functionData.features.length > 0) {
+            const featuresData = functionData.features.map((feature: any, index: number) => ({
+              project_id: project.id,
+              title: feature.title,
+              description: feature.description,
+              priority: feature.priority || "could",
+              effort: feature.effort,
+              value_score: feature.valueScore,
+              is_mvp: index < 7,
+              order_index: index
+            }));
+
+            const { error: featuresError } = await supabase
+              .from("features")
+              .insert(featuresData);
+
+            if (featuresError) throw featuresError;
+          }
+
+          // Log activity
+          await supabase.from("activity_logs").insert({
+            project_id: project.id,
+            actor_id: user.id,
+            action: "project_created",
+            payload: { source: "wizard" }
+          });
+
+          onComplete({ ...functionData, projectId: project.id });
+        } catch (dbError: any) {
+          console.error("Error saving project:", dbError);
+          toast({
+            title: "Error",
+            description: dbError.message || "Failed to save project",
+            variant: "destructive"
+          });
+          setError("Failed to save project. Please try again.");
+        }
 
       } catch (err) {
         console.error('AI generation error:', err);

@@ -23,8 +23,8 @@ export default function ProjectVision() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { projectData, visionData } = location.state || {};
-  
+  const { projectData, visionData, projectId } = location.state || {};
+
   // Ensure hooks are always called; redirect via effect to satisfy hooks rules
   useEffect(() => {
     if (!projectData || !visionData) {
@@ -109,7 +109,8 @@ export default function ProjectVision() {
     navigate("/project/features", { 
       state: { 
         projectData, 
-        visionData: { ...visionData, valueProposition: currentVision }
+        visionData: { ...visionData, valueProposition: currentVision },
+        projectId
       }
     });
   };
