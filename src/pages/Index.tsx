@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock, FolderOpen, Sparkles, Filter, ChevronRight } from "lucide-react";
 import { KPICard } from "@/components/dashboard/KPICard";
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 // Mock data
 const kpiData = [
@@ -90,8 +91,43 @@ const mockProjects = [
 
 const Index = () => {
   const [filter, setFilter] = useState("all");
-  const [projects] = useState(mockProjects);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Transform database projects to match UI format
+      const transformedProjects = data?.map(project => ({
+        id: project.id,
+        title: project.title,
+        description: project.value_proposition || project.problem_statement || "",
+        status: project.status,
+        lastUpdated: new Date(project.updated_at).toLocaleDateString(),
+        tags: project.target_audience || [],
+        owner: { name: "User" },
+        priority: "medium" as const,
+        progress: project.status === "active" ? 100 : project.status === "draft" ? 30 : 0,
+      })) || [];
+
+      setProjects(transformedProjects);
+    } catch (error) {
+      console.error("Error loading projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleHomeClick = () => {
     navigate("/");
@@ -104,8 +140,8 @@ const Index = () => {
     }
   };
 
-  // Show empty state if no projects
-  const showEmptyState = projects.length === 0;
+  // Show empty state if no projects or still loading
+  const showEmptyState = !loading && projects.length === 0;
 
   const filteredProjects = projects.filter(project => {
     if (filter === "all") return true;
@@ -133,16 +169,23 @@ const Index = () => {
             </nav>
             <div className="space-y-1">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground">
-                Welcome back, Alex 👋
+                Welcome to LiveDoc 👋
               </h1>
               <p className="text-sm sm:text-base text-text-secondary">
-                Here's what's happening with your projects today.
+                Create and manage your product requirement documents.
               </p>
             </div>
           </div>
 
           {showEmptyState ? (
             <EmptyState />
+          ) : loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading projects...</p>
+              </div>
+            </div>
           ) : (
             <>
               {/* KPI Cards */}
@@ -209,8 +252,8 @@ const Index = () => {
                   {filteredProjects.map((project, index) => (
                     <ProjectCard
                       key={project.id}
-                    {...project}
-                      onClick={() => console.log(`Opening project ${project.id}`)}
+                      {...project}
+                      onClick={() => navigate(`/project/moscow`, { state: { projectId: project.id } })}
                       style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties}
                     />
                   ))}

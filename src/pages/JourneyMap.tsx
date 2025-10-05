@@ -89,10 +89,13 @@ export default function JourneyMap() {
 
       if (error) throw error;
 
+      // Get user if authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Log activity
       await supabase.from("activity_logs").insert({
         project_id: projectId,
-        actor_id: (await supabase.auth.getUser()).data.user?.id,
+        actor_id: user?.id || null,
         action: "journey_map_created",
         payload: { step_count: steps.length }
       });

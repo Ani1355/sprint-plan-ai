@@ -79,23 +79,14 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
 
         // Save project to database
         try {
+          // Get user if authenticated, otherwise allow anonymous
           const { data: { user } } = await supabase.auth.getUser();
-          
-          if (!user) {
-            toast({
-              title: "Authentication Required",
-              description: "Please sign in to save your project.",
-              variant: "destructive"
-            });
-            navigate("/");
-            return;
-          }
 
-          // Create project
+          // Create project (owner_id can be null for anonymous users)
           const { data: project, error: projectError } = await supabase
             .from("projects")
             .insert({
-              owner_id: user.id,
+              owner_id: user?.id || null,
               title: projectData.projectName,
               target_audience: projectData.targetAudience,
               problem_statement: projectData.problem,
@@ -134,7 +125,7 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
           // Log activity
           await supabase.from("activity_logs").insert({
             project_id: project.id,
-            actor_id: user.id,
+            actor_id: user?.id || null,
             action: "project_created",
             payload: { source: "wizard" }
           });

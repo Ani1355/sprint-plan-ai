@@ -195,7 +195,7 @@ export type Database = {
           description: string | null
           id: string
           magic_moment: string | null
-          owner_id: string
+          owner_id: string | null
           platforms: string[] | null
           primary_user_action: string | null
           problem_statement: string | null
@@ -212,7 +212,7 @@ export type Database = {
           description?: string | null
           id?: string
           magic_moment?: string | null
-          owner_id: string
+          owner_id?: string | null
           platforms?: string[] | null
           primary_user_action?: string | null
           problem_statement?: string | null
@@ -229,7 +229,7 @@ export type Database = {
           description?: string | null
           id?: string
           magic_moment?: string | null
-          owner_id?: string
+          owner_id?: string | null
           platforms?: string[] | null
           primary_user_action?: string | null
           problem_statement?: string | null
