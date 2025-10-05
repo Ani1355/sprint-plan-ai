@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
@@ -192,6 +192,10 @@ export function AIGenerationModal({ open, projectData, onComplete, onClose }: AI
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md">
+        <DialogTitle className="sr-only">AI Generation Progress</DialogTitle>
+        <DialogDescription className="sr-only">
+          Generating your product vision and features using AI
+        </DialogDescription>
         <div className="text-center space-y-6 py-6">
           {error ? (
             // Error State

@@ -3,9 +3,6 @@ import { NavLink, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Plus, 
-  FolderOpen, 
-  FileText, 
-  Settings, 
   HelpCircle,
   ChevronLeft,
   Sparkles
@@ -16,13 +13,10 @@ import { Button } from "@/components/ui/button";
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "New Project", href: "/new", icon: Plus },
-  { name: "Projects", href: "/projects", icon: FolderOpen },
-  { name: "Templates", href: "/templates", icon: FileText },
 ];
 
 const bottomNavigation = [
-  { name: "Settings", href: "/settings", icon: Settings },
-  { name: "Help", href: "/help", icon: HelpCircle },
+  { name: "Help", href: "https://docs.lovable.dev", icon: HelpCircle },
 ];
 
 export function Sidebar() {
@@ -94,23 +88,21 @@ export function Sidebar() {
       <div className="p-2 lg:p-4 border-t border-sidebar-border space-y-1">
         {bottomNavigation.map((item) => {
           const Icon = item.icon;
-          const active = isActive(item.href);
           
           return (
-            <NavLink
+            <a
               key={item.name}
-              to={item.href}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-body-small font-medium transition-all duration-200 min-h-[44px]",
-                active 
-                  ? "bg-sidebar-active text-sidebar-active-foreground shadow-soft" 
-                  : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
+                "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
               )}
-              aria-current={active ? 'page' : undefined}
             >
               <Icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
               {!collapsed && <span>{item.name}</span>}
-            </NavLink>
+            </a>
           );
         })}
       </div>
