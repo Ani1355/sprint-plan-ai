@@ -52,7 +52,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   
-  const statusInfo = statusConfig[status];
+  const statusInfo = statusConfig[status] || statusConfig.draft;
 
   return (
     <article 
